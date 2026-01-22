@@ -1,0 +1,127 @@
+# Day 2 of DSA 🚀  
+## TWENDS - Two Ends (Dynamic Programming)
+
+---
+
+## 📌 Problem Statement
+In the two-player game **Two Ends**, an even number of cards is laid out in a row. Each card has a positive integer value.
+
+Players take turns picking **one card from either end** of the row.
+
+- **Player 2 always plays Greedy**
+  - Picks the larger end card
+  - If both ends are equal → picks the **left one**
+- **Player 1 plays optimally** to maximize the score difference.
+
+✅ Goal: Find the **maximum number of points** by which the greedy strategy **can lose**.
+
+---
+
+## 🧠 Approach (Dynamic Programming)
+Since Player 2’s move is fixed (greedy), Player 1 can plan moves to force Player 2 into bad choices.
+
+We define:
+
+`dp[i][j]` = maximum score Player 1 can collect from subarray `i...j`  
+(when it’s Player 1’s turn and Player 2 responds greedily)
+
+Player 1 has two options:
+1. Pick left end `a[i]`
+2. Pick right end `a[j]`
+
+After Player 1 picks, Player 2 greedily picks the best of the remaining ends, reducing the range.
+
+---
+
+## ✅ Score Difference Formula
+Let:
+- Total sum of all cards = `S`
+- Player 1 score = `F`
+- Player 2 score = `S - F`
+
+Difference:
+
+`F - (S - F) = 2F - S`
+
+---
+
+## ✅ Java Code
+
+```java
+import java.util.*;
+import java.io.*;
+
+class Main {
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int tc_no = 1;
+
+        while (true) {
+            String line = br.readLine();
+            String[] parts = line.split(" ");
+            int n = Integer.parseInt(parts[0]);
+
+            if (n == 0) break;
+
+            int[] a = new int[n];
+            int total = 0;
+            for (int i = 0; i < n; i++) {
+                a[i] = Integer.parseInt(parts[i + 1]);
+                total += a[i];
+            }
+
+            int[][] dp = new int[n][n];
+            for (int[] row : dp) Arrays.fill(row, -1);
+
+            int firstScore = solve(0, n - 1, a, dp);
+            int diff = 2 * firstScore - total;
+
+            System.out.printf(
+                "In game %d, the greedy strategy might lose by as many as %d points.\n",
+                tc_no, diff
+            );
+            tc_no++;
+        }
+    }
+
+    public static int solve(int i, int j, int[] a, int[][] dp) {
+        if (i > j) return 0;
+        if (i == j) return a[i];
+        if (dp[i][j] != -1) return dp[i][j];
+
+        int op1, op2;
+
+        // Player 1 picks left
+        if (a[i + 1] >= a[j]) {
+            op1 = a[i] + solve(i + 2, j, a, dp);
+        } else {
+            op1 = a[i] + solve(i + 1, j - 1, a, dp);
+        }
+
+        // Player 1 picks right
+        if (a[i] >= a[j - 1]) {
+            op2 = a[j] + solve(i + 1, j - 1, a, dp);
+        } else {
+            op2 = a[j] + solve(i, j - 2, a, dp);
+        }
+
+        return dp[i][j] = Math.max(op1, op2);
+    }
+}
+```
+## Complexity
+
+#### Time Complexity: O(n^2)
+
+#### Space Complexity: O(n^2)
+
+## Input
+4 3 2 10 4
+8 1 2 3 4 5 6 7 8
+8 2 2 1 5 3 8 7 3
+0
+## Output
+In game 1, the greedy strategy might lose by as many as 7 points.
+In game 2, the greedy strategy might lose by as many as 4 points.
+In game 3, the greedy strategy might lose by as many as 5 points.
+
