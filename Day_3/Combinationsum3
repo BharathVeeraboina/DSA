@@ -1,0 +1,99 @@
+# Day 3 of DSA 🚀  
+## 216. Combination Sum III (Backtracking)
+
+---
+
+## 📌 Problem Statement  
+Find all valid combinations of **k** numbers that sum up to **n** such that:
+
+- Only numbers **1 through 9** are used  
+- Each number is used **at most once**  
+- Return all possible valid combinations  
+- No duplicate combinations allowed  
+
+---
+
+## ✅ Example  
+
+### Example 1  
+**Input:** `k = 3, n = 7`  
+**Output:** `[[1,2,4]]`
+
+### Example 2  
+**Input:** `k = 3, n = 9`  
+**Output:** `[[1,2,6],[1,3,5],[2,3,4]]`
+
+---
+
+## 🧠 Approach (Backtracking)
+
+We try numbers from **1 to 9** and at each index we have two choices:
+
+1. ✅ **Take the current number**
+2. ❌ **Skip the current number**
+
+We maintain:
+- `a` → current combination
+- `sum` → current sum
+- `i` → current index (0 to 8)
+- Stop when:
+  - `a.size() == k` and `sum == n` → store answer ✅
+  - `sum > n` or `a.size() > k` → invalid path ❌
+  - `i >= 9` → out of range ❌
+
+This ensures we generate unique combinations because we only move forward.
+
+---
+
+## ✅ Java Code (My Solution)
+
+```java
+import java.util.*;
+
+class Solution {
+    List<List<Integer>> ans;
+    int N;
+
+    public List<List<Integer>> combinationSum3(int k, int n) {
+        N = n;
+        int sum = 0;
+        ans = new ArrayList<>();
+
+        List<Integer> l = new ArrayList<>();
+        for (int i = 1; i <= 9; i++) {
+            l.add(i);
+        }
+
+        List<Integer> a = new ArrayList<>();
+        helper(0, a, l, k, sum);
+
+        return ans;
+    }
+
+    void helper(int i, List<Integer> a, List<Integer> l, int k, int sum) {
+        if (a.size() == k && sum == N) {
+            ans.add(new ArrayList<>(a));
+            return;
+        }
+
+        if (sum > N || a.size() > k) return;
+        if (i >= 9) return;
+
+        // Pick current number
+        a.add(l.get(i));
+        sum += l.get(i);
+        helper(i + 1, a, l, k, sum);
+
+        // Backtrack
+        a.remove(a.size() - 1);
+        sum -= l.get(i);
+
+        // Skip current number
+        helper(i + 1, a, l, k, sum);
+    }
+}
+
+```
+# Complexity
+## Time Complexity : O(2^9)
+## Space Complexity: O(K)
