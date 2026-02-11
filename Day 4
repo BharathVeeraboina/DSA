@@ -1,0 +1,138 @@
+# Day 4 of DSA 🚀  
+## 123. Best Time to Buy and Sell Stock III (DP + Memoization)
+
+---
+
+## 📌 Problem Statement  
+
+You are given an array `prices` where:
+
+- `prices[i]` is the price of a given stock on the `i-th` day  
+- You may complete **at most two transactions**  
+- You must **sell the stock before buying again**  
+
+Return the **maximum profit** you can achieve.
+
+---
+
+## ✅ Examples  
+
+### Example 1  
+**Input:**  
+`prices = [3,3,5,0,0,3,1,4]`  
+
+**Output:**  
+`6`  
+
+**Explanation:**  
+Buy at price `0` and sell at `3` → profit = 3  
+Buy at price `1` and sell at `4` → profit = 3  
+Total profit = 6  
+
+---
+
+### Example 2  
+**Input:**  
+`prices = [1,2,3,4,5]`  
+
+**Output:**  
+`4`  
+
+---
+
+### Example 3  
+**Input:**  
+`prices = [7,6,4,3,1]`  
+
+**Output:**  
+`0`  
+
+---
+
+## 🧠 Approach (3D Dynamic Programming)
+
+We use a 3D DP array:
+
+```
+dp[i][f][j]
+```
+
+Where:
+
+- `i` → current day  
+- `f` → stock holding state  
+  - `0` = not holding stock  
+  - `1` = holding stock  
+- `j` → number of completed transactions  
+
+---
+
+## 🔹 Base Conditions  
+
+- If `i == prices.length`, return `0`  
+- If `j == 2`, return `0`  
+
+---
+
+## 🔹 State Transitions  
+
+If holding stock (`f = 1`):
+- Sell → `prices[i] + dp[i+1][0][j+1]`
+- Skip → `dp[i+1][1][j]`
+
+If not holding stock (`f = 0`):
+- Buy → `dp[i+1][1][j] - prices[i]`
+- Skip → `dp[i+1][0][j]`
+
+---
+
+## ✅ Java Code (My Solution)
+
+```java
+import java.util.*;
+
+class Solution {
+    int[][][] dp;
+
+    public int maxProfit(int[] prices) {
+        int n = prices.length;
+        dp = new int[n][2][2];
+
+        for (int[][] a : dp)
+            for (int[] x : a)
+                Arrays.fill(x, -1);
+
+        return helper(prices, 0, 0, 0);
+    }
+
+    int helper(int[] prices, int i, int j, int f) {
+        if (i == prices.length || j == 2) {
+            return 0;
+        }
+
+        if (dp[i][f][j] != -1)
+            return dp[i][f][j];
+
+        if (f == 1) {
+            return dp[i][f][j] = Math.max(
+                prices[i] + helper(prices, i + 1, j + 1, 0),
+                helper(prices, i + 1, j, f)
+            );
+        } else {
+            return dp[i][f][j] = Math.max(
+                helper(prices, i + 1, j, 1) - prices[i],
+                helper(prices, i + 1, j, 0)
+            );
+        }
+    }
+}
+```
+
+---
+
+## 📊 Complexity Analysis  
+
+- Time Complexity: `O(n)`  
+- Space Complexity: `O(n)`  
+
+---
